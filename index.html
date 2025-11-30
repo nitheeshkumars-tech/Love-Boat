@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dream Boat — Love Game</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0f0210;
+      --card:#2b0f1a;
+      --rose-1:#ff9acb;
+      --rose-2:#ff5fa8;
+      --rose-3:#ff1f7a;
+      --accent-2:#ffd1e8;
+      --glass: rgba(255,255,255,0.04);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#12020a 0%, #050008 100%);font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;color:var(--accent-2);}
+    .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}
+    .card{width:min(980px,96vw);background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-radius:18px;padding:18px;box-shadow: 0 10px 40px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.03);display:grid;grid-template-columns:1fr 380px;gap:20px}
+    .neon-logo{position:relative;padding:6px 14px;font-weight:900;background:linear-gradient(90deg,var(--rose-2),var(--rose-1));color:white;border-radius:12px;box-shadow:0 6px 30px rgba(255,31,122,0.25),0 0 40px rgba(255,95,168,0.08);}
+    .neon-logo::after{content:'';position:absolute;left:0;right:0;top:0;bottom:0;border-radius:12px;box-shadow:0 0 40px rgba(255,31,122,0.45);mix-blend-mode:screen;pointer-events:none}
+    .header{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+    .logo{width:64px;height:64px;border-radius:16px;background:radial-gradient(circle at 30% 30%,var(--rose-3),var(--rose-1));display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:20px;box-shadow:0 10px 30px rgba(255,95,168,0.12)}
+    h1{font-size:20px;margin:0;color:var(--rose-3)}
+    p.lead{margin:6px 0 12px;color:rgba(255,255,255,0.75)}
+    .board-wrap{background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.04);position:relative;overflow:hidden}
+    .board{width:460px;height:460px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:12px;border-radius:12px;background:linear-gradient(180deg,#3a0f23 0%, #230414 100%);box-shadow: inset 0 6px 30px rgba(0,0,0,0.5)}
+    .cell{background:var(--glass);border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;transition:transform .18s ease, box-shadow .18s ease;position:relative}
+    .cell:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(255,95,168,0.06) inset, 0 10px 30px rgba(0,0,0,0.6)}
+    .cell.taken{cursor:default}
+    .board::before{content:'';position:absolute;left:12px;right:12px;top:12px;bottom:12px;border-radius:12px;box-shadow:0 0 60px rgba(255,31,122,0.05) inset}
+    .sidebar{padding:14px;background:linear-gradient(120deg, rgba(255,255,255,0.01), transparent);border-radius:12px}
+    .score{display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .pill{background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent);padding:10px 12px;border-radius:12px;color:var(--accent-2);font-weight:700}
+    .controls{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+    button.btn{background:linear-gradient(90deg,var(--rose-1),var(--rose-2));border:none;padding:10px 12px;border-radius:14px;color:white;cursor:pointer;font-weight:800;box-shadow:0 8px 30px rgba(255,31,122,0.12)}
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+    .challenges{margin-top:14px}
+    .chip{display:inline-block;padding:8px 10px;border-radius:999px;background:linear-gradient(90deg, rgba(255,111,181,0.12), rgba(255,111,181,0.06));margin:6px;font-weight:700}
+    .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .2s ease}
+    .modal.open{opacity:1;pointer-events:auto}
+    .modal-card{width:min(560px,92vw);background:linear-gradient(180deg,#3a1b2a,#241018);border-radius:14px;padding:20px;border:1px solid rgba(255,255,255,0.04);text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.6)}
+    .modalEmoji{font-size:58px;display:block;margin-bottom:8px}
+    .modal-sub{color:rgba(255,255,255,0.75);font-size:15px;margin-top:8px}
+    #loveMeter{height:14px;background:rgba(255,255,255,0.04);border-radius:10px;overflow:hidden}
+    #loveFill{height:100%;width:0%;background:linear-gradient(90deg,var(--rose-2),var(--rose-1));transition:width .45s ease}
+    @keyframes floatPetal { 0%{transform:translateY(0) rotate(0deg) scale(0.9);opacity:0.95} 100%{transform:translateY(-140vh) rotate(360deg) scale(1.2);opacity:0.12} }
+    .petal{position:fixed;bottom:-10vh;pointer-events:none;font-size:22px;opacity:0.9;animation:floatPetal linear infinite}
+    @keyframes intertwineHearts { 0%{transform:scale(0) translateX(0);} 50%{transform:scale(1.35) translateX(6px);} 100%{transform:scale(1) translateX(0);} }
+    .tieAnimHeart{ position:fixed; font-size:64px; left:50%; top:50%; transform:translate(-50%,-50%); animation:intertwineHearts 0.9s ease-out; pointer-events:none; }
+    .dualCard{ display:flex; gap:14px; justify-content:center; margin-top:10px }
+    .dualCard div{ background:rgba(255,255,255,0.03); padding:12px 14px; border-radius:12px; font-weight:800; color:var(--accent-2) }
+    .mark-svg{width:70%;height:70%;display:block}
+    .o-stroke{filter:drop-shadow(0 6px 20px rgba(255,95,168,0.25));}
+    .x-stroke{filter:drop-shadow(0 6px 20px rgba(255,31,122,0.25));}
+    .sparkle{position:fixed;font-size:22px;pointer-events:none;z-index:80}
+    .modalEmoji.simple{position:fixed;font-size:36px}
+    @media (max-width:980px){.card{grid-template-columns:1fr;} .board{width:86vw;height:86vw}}
+  </style>
+</head>
+<body>
+  <div style="position:fixed;left:12px;right:12px;top:12px;z-index:60">
+    <div style="display:flex;align-items:center;gap:12px;justify-content:center">
+      <div style="font-weight:800;color:var(--rose-3)">Float</div>
+      <div id="loveMeter" style="width:40%"><div id="loveFill"></div></div>
+      <div id="loveLabel" style="font-weight:700;color:rgba(255,255,255,0.8)">Love 0%</div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="card" role="application">
+      <div>
+        <div class="header">
+          <div class="logo neon-logo"><img src="/Twitch_Icon.png"  height="70"></div>
+          <div>
+            <h1>DREAM BOAT -🤍</h1>
+            <p class="lead">Love isn’t just a feeling, it’s the little moments that make life beautiful. <br>Each victory gives you sweet dare. Play fair 😘 & Let's Dive in Boat !</p>
+          </div>
+        </div>
+        <div class="board-wrap">
+          <div id="board" class="board" aria-label="tic tac toe board"></div>
+          <div style="margin-top:12px;display:flex;gap:12px;align-items:center;justify-content:space-between">
+            <div style="color:rgba(255,255,255,0.85);font-weight:800">Turn: <span id="turnLabel">X</span></div>
+            <div style="color:rgba(255,255,255,0.6);font-size:14px">Tip: click a cell — get points & a challenge!</div>
+          </div>
+        </div>
+        <footer style="margin-top:10px;color:rgba(255,255,255,0.6)">Made with ❤️ — adapt the challenges in the sidebar. Enjoy responsibly.</footer>
+      </div>
+      <aside class="sidebar">
+        <div class="score">
+          <div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.6)">Score</div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <div class="pill" id="pillX">X: <span id="scoreX">0</span></div>
+              <div class="pill" id="pillO">O: <span id="scoreO">0</span></div>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:12px;color:rgba(255,255,255,0.6)">Rounds</div>
+            <div style="font-weight:800;font-size:18px;margin-top:6px" id="rounds">0</div>
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <div style="font-size:13px;color:rgba(255,255,255,0.75);font-weight:700">Players</div>
+          <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+            <input id="xName" placeholder="Name for X" style="flex:1;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--accent-2)">
+            <input id="oName" placeholder="Name for O" style="flex:1;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--accent-2)">
+          </div>
+          <div style="margin-top:8px;display:flex;gap:8px">
+            <button id="applyNamesBtn" class="btn">Apply</button>
+            <button id="resetAllBtn2" class="btn ghost">Reset</button>
+          </div>
+        </div>
+        <div class="controls">
+          <button class="btn" id="restartBtn">Restart Round</button>
+          <button class="btn ghost" id="shuffleChallenges">Shuffle Challenges</button>
+          <button class="btn" id="spinPunishmentBtn">Punishment Wheel</button>
+          <button class="btn" id="spinWheelBtn">Spin Challenge</button>
+        </div>
+        <div class="challenges">
+          <div style="font-size:13px;color:rgba(255,255,255,0.75);font-weight:700">Challenges (click to remove)</div>
+          <div id="challengesList" style="margin-top:10px"></div>
+          <div style="margin-top:10px;display:flex;gap:8px">
+            <input id="newChallenge" placeholder="Add a challenge (e.g. 10s hug)" style="flex:1;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);background:transparent;color:var(--accent-2)" />
+            <button class="btn" id="addChallenge">Add</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <div id="modal" class="modal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modalEmoji" id="modalEmoji">🎉</div>
+      <div class="challenge-text" id="modalText">You won! Do your challenge</div>
+      <div class="modal-sub" id="modalSub">Tap done when completed</div>
+      <div style="margin-top:12px;display:flex;gap:8px;justify-content:center">
+        <button class="btn" id="claimBtn">Claim</button>
+        <button class="btn ghost" id="closeModal">Close</button>
+      </div>
+    </div>
+  </div>
+  <canvas id="confettiCanvas" class="sparkle" width="800" height="400" style="position:fixed;left:0;top:0;pointer-events:none;z-index:70"></canvas>
+  <div id="giftModal" class="modal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modalEmoji" id="giftEmoji">🎁</div>
+      <div class="challenge-text" id="giftText">Lip-Lock Love</div>
+      <div class="modal-sub" id="giftSub">You've reached 100% — claim your lip-lock 💋</div>
+      <div style="margin-top:12px;display:flex;gap:8px;justify-content:center">
+        <button class="btn" id="giftClaimBtn">Claim Gift</button>
+        <button class="btn ghost" id="giftCloseBtn">Close</button>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <script>
+  setInterval(()=>{
+    const p = document.createElement('div');
+    p.className='petal';
+    const pool = ['❤️‍🩹','🤍','💗','💖','💓','💞','🕊'];
+    p.textContent = pool[Math.floor(Math.random()*pool.length)];
+    p.style.left = Math.random()*100 + 'vw';
+    p.style.animationDuration = 6 + Math.random()*6 + 's';
+    p.style.fontSize = (14 + Math.random()*28) + 'px';
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),12000);
+  },900);
+  function runConfetti(){ if(window.confetti){ const c = confetti.create(document.getElementById('confettiCanvas'), {resize:true}); c({particleCount:40,spread:70,startVelocity:30}); setTimeout(()=>c({particleCount:24,spread:100,startVelocity:20}),300);} }
+  const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  function playBeep(freq, type='sine', duration=0.12){
+    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+    o.type=type; o.frequency.value=freq; g.gain.value=0.0025;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+    setTimeout(()=>{ o.stop(); }, duration*1000+50);
+  }
+  function playPop(){ playBeep(880,'sine',0.09); }
+  function playChime(){ playBeep(620,'triangle',0.18); }
+  function playKiss(){ playBeep(780,'sine',0.08); playBeep(980,'sine',0.06); }
+  const boardEl = document.getElementById('board');
+  const turnLabel = document.getElementById('turnLabel');
+  const modal = document.getElementById('modal');
+  const modalText = document.getElementById('modalText');
+  const modalSub = document.getElementById('modalSub');
+  const modalEmoji = document.getElementById('modalEmoji');
+  const claimBtn = document.getElementById('claimBtn');
+  const closeModal = document.getElementById('closeModal');
+  const scoreX = document.getElementById('scoreX');
+  const scoreO = document.getElementById('scoreO');
+  const roundsEl = document.getElementById('rounds');
+  const challengesList = document.getElementById('challengesList');
+  const newChallenge = document.getElementById('newChallenge');
+  const pillX = document.getElementById('pillX');
+  const pillO = document.getElementById('pillO');
+  const loveFill = document.getElementById('loveFill');
+  const loveLabel = document.getElementById('loveLabel');
+  let playerX='X', playerO='O', turn='X';
+  let giftShown = false;
+  let board = Array(9).fill(null);
+  let scores = {X:0,O:0}; let rounds = 0; let lovePoints=0;
+  let challenges = ['10‑second hug','Sweet kiss','Compliment','Slow dance','Backrub','Share a secret','Movie pick','Whisper something sweet','Favorite memory','Forehead kiss'];
+  function renderChallenges(){ challengesList.innerHTML=''; challenges.forEach((c,i)=>{ const chip=document.createElement('span'); chip.className='chip'; chip.textContent=c; chip.onclick=()=>{ challenges.splice(i,1); renderChallenges(); }; challengesList.appendChild(chip); }); }
+  function createBoard(){ boardEl.innerHTML=''; for(let i=0;i<9;i++){ const cell=document.createElement('div'); cell.className='cell'; cell.dataset.index=i; cell.addEventListener('click',(e)=>onCellClick(i,cell,e)); boardEl.appendChild(cell);} }
+  function makeX(){
+    const ns='http://www.w3.org/2000/svg';
+    const svg=document.createElementNS(ns,'svg'); svg.setAttribute('viewBox','0 0 100 100'); svg.classList.add('mark-svg');
+    const defs=document.createElementNS(ns,'defs');
+    const grad=document.createElementNS(ns,'linearGradient'); grad.id='gx'+Math.random().toString(36).slice(2); grad.setAttribute('x1','0'); grad.setAttribute('x2','1');
+    const s1=document.createElementNS(ns,'stop'); s1.setAttribute('offset','0%'); s1.setAttribute('stop-color','var(--rose-1)');
+    const s2=document.createElementNS(ns,'stop'); s2.setAttribute('offset','50%'); s2.setAttribute('stop-color','var(--rose-2)');
+    const s3=document.createElementNS(ns,'stop'); s3.setAttribute('offset','100%'); s3.setAttribute('stop-color','var(--rose-3)');
+    grad.appendChild(s1); grad.appendChild(s2); grad.appendChild(s3); defs.appendChild(grad);
+    const animate = document.createElementNS(ns,'animate'); animate.setAttribute('attributeName','x1'); animate.setAttribute('dur','3s'); animate.setAttribute('values','0;1;0'); animate.setAttribute('repeatCount','indefinite'); grad.appendChild(animate);
+    svg.appendChild(defs);
+    const path=document.createElementNS(ns,'path'); path.setAttribute('d','M20 20 L80 80 M80 20 L20 80'); path.setAttribute('stroke','url(#'+grad.id+')'); path.setAttribute('stroke-width','10'); path.setAttribute('stroke-linecap','round'); path.setAttribute('fill','none'); path.classList.add('x-stroke'); svg.appendChild(path);
+    return svg;
+  }
+function makeO(){
+    const ns='http://www.w3.org/2000/svg';
+    const svg=document.createElementNS(ns,'svg'); 
+    svg.setAttribute('viewBox','0 0 100 100'); 
+    svg.classList.add('mark-svg');
+
+    const defs=document.createElementNS(ns,'defs');
+    const grad=document.createElementNS(ns,'linearGradient'); 
+    grad.id='go'+Math.random().toString(36).slice(2); 
+    grad.setAttribute('x1','0'); 
+    grad.setAttribute('x2','1');
+
+    const s1=document.createElementNS(ns,'stop'); 
+    s1.setAttribute('offset','0%'); 
+    s1.setAttribute('stop-color','var(--rose-3)');
+    const s2=document.createElementNS(ns,'stop'); 
+    s2.setAttribute('offset','50%'); 
+    s2.setAttribute('stop-color','var(--rose-2)');
+    const s3=document.createElementNS(ns,'stop'); 
+    s3.setAttribute('offset','100%'); 
+    s3.setAttribute('stop-color','var(--rose-1)');
+
+    grad.appendChild(s1); 
+    grad.appendChild(s2); 
+    grad.appendChild(s3); 
+    defs.appendChild(grad);
+
+    const animate = document.createElementNS(ns,'animate'); 
+    animate.setAttribute('attributeName','x1'); 
+    animate.setAttribute('dur','3s'); 
+    animate.setAttribute('values','0;1;0'); 
+    animate.setAttribute('repeatCount','indefinite'); 
+    grad.appendChild(animate);
+
+    svg.appendChild(defs);
+
+    const path=document.createElementNS(ns,'path'); 
+    path.setAttribute('d','M50 10 A40 40 0 1 1 49.99 10'); // Circle path
+    path.setAttribute('stroke','url(#'+grad.id+')'); 
+    path.setAttribute('stroke-width','10'); 
+    path.setAttribute('stroke-linecap','round'); 
+    path.setAttribute('fill','none'); 
+    path.classList.add('o-stroke'); 
+    svg.appendChild(path);
+
+    return svg;
+}
+
+  function onCellClick(i,cell,ev){ if(board[i] || isGameOver()) return; board[i]=turn; cell.classList.add('taken'); const mark = (turn==='X') ? makeX() : makeO(); cell.appendChild(mark); popEmojiAtElement(cell); playPop(); const winner = checkWinner(); if(winner){ scores[winner]++; updateScores(); rounds++; roundsEl.textContent=rounds; showWin(winner);} else if(board.every(Boolean)){ rounds++; roundsEl.textContent=rounds; showTie(); } else { turn = turn==='X'?'O':'X'; turnLabel.textContent=turn; } }
+  function popEmojiAtElement(el){ const r=el.getBoundingClientRect(); const x=r.left + r.width/2; const y=r.top + r.height/2; const e=document.createElement('div'); e.className='modalEmoji'; e.style.position='fixed'; e.style.left=(x-20)+'px'; e.style.top=(y-20)+'px'; e.style.zIndex=90; e.textContent=['💖','😍','😘','💕','✨'][Math.floor(Math.random()*5)]; document.body.appendChild(e); setTimeout(()=>e.remove(),700); }
+  function checkWinner(){ const L=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; for(const [a,b,c] of L){ if(board[a] && board[a]===board[b] && board[a]===board[c]) return board[a]; } return null; }
+  function isGameOver(){ return !!checkWinner() || board.every(Boolean); }
+  function updateScores(){ scoreX.textContent=scores.X; scoreO.textContent=scores.O; }
+  function showWin(winner){ highlightWin(winner); const challenge = pickChallenge(); modalEmoji.textContent = winner==='X' ? '✨' : '💖'; modalText.innerHTML = `${winner==='X'?playerX:playerO} wins — <strong>${challenge}</strong>`; modalSub.textContent='Tap claim when done'; openModal(); runConfetti(); playChime(); addLovePoints(12); }
+  function showTie(){ playTieAnimation(); const bothTasks=['Funny Kiss','Double Hug','Tickle Challenge','Nose Boop','Shared Selfie Pose','Cheek Kiss','Both Say Compliment']; const t1=bothTasks[Math.floor(Math.random()*bothTasks.length)]; let t2=bothTasks[Math.floor(Math.random()*bothTasks.length)]; if(t1===t2 && bothTasks.length>1){ t2 = bothTasks.filter(x=>x!==t1)[Math.floor(Math.random()*(bothTasks.length-1))]; } const funnyQuotes = ["Tie? Looks like the universe loves your balance.","A tie — destiny says: double the cute!","You two are equally charming. The score agrees.","Perfectly matched — now do something silly together!","Equal hearts, equal mischief. Ready?"]; const q = funnyQuotes[Math.floor(Math.random()*funnyQuotes.length)]; modalEmoji.textContent='💞'; modalText.innerHTML = `<strong>It's a tie!</strong><br><em>${q}</em>`; modalSub.innerHTML = `<div class=\"dualCard\"><div>${t1}</div><div>${t2}</div></div>`; openModal(); victorySparkles(); playKiss(); addLovePoints(20); }
+  function highlightWin(winner){ const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; for(const l of lines){ if(board[l[0]] && board[l[0]]===board[l[1]] && board[l[1]]===board[l[2]]){ l.forEach(i=>{ const c=document.querySelector(`.cell[data-index='${i}']`); if(c) c.animate([{transform:'scale(1)'},{transform:'scale(1.08)'},{transform:'scale(1)'}],{duration:900,iterations:3}); }); } } }
+  function pickChallenge(){ if(challenges.length===0) return 'Winner chooses any sweet act ❤️'; return challenges[Math.floor(Math.random()*challenges.length)]; }
+  function openModal(){ modal.classList.add('open'); }
+  function closeModalNow(){ modal.classList.remove('open'); resetBoard(); }
+  function resetBoard(){ board=Array(9).fill(null); document.querySelectorAll('.cell').forEach(c=>{ c.classList.remove('taken'); c.innerHTML=''; }); turn = rounds%2===0 ? 'X' : 'O'; turnLabel.textContent=turn; }
+  function victorySparkles(){ for(let i=0;i<14;i++){ const s=document.createElement('div'); s.className='sparkle'; s.textContent=['✨','💖','🌟'][Math.floor(Math.random()*3)]; s.style.left=Math.random()*100+'vw'; s.style.top=Math.random()*100+'vh'; document.body.appendChild(s); setTimeout(()=>s.remove(),900); } }
+  function playTieAnimation(){ const h1=document.createElement('div'); const h2=document.createElement('div'); h1.className='tieAnimHeart'; h2.className='tieAnimHeart'; h1.textContent='💗'; h2.textContent='💞'; h1.style.left='46%'; h2.style.left='54%'; document.body.appendChild(h1); document.body.appendChild(h2); setTimeout(()=>{ h1.remove(); h2.remove(); }, 1100); }
+  function showGiftModal(){ const gm = document.getElementById('giftModal'); if(!gm) return; gm.classList.add('open'); runConfetti(); playChime(); }
+  function closeGiftModal(){ const gm = document.getElementById('giftModal'); if(gm) gm.classList.remove('open'); }
+  function checkLoveThreshold(){ if(lovePoints>=100 && !giftShown){ giftShown=true; showGiftModal(); } }
+  function addLovePoints(p){ lovePoints = Math.min(100, lovePoints + p); loveFill.style.width = lovePoints + '%'; loveLabel.textContent = 'Love ' + lovePoints + '%'; checkLoveThreshold(); }
+  function spinPunishmentWheel(){ const wheel=['Funny Kiss','Goofy Pose','Silly Compliment','Cute Dance','Nose Boop','Tickle Sprint','Bunny Ears Photo']; const res = wheel[Math.floor(Math.random()*wheel.length)]; modalEmoji.textContent='🎡'; modalText.innerHTML=`Punishment: <strong>${res}</strong>`; modalSub.textContent='Do it together!'; openModal(); addLovePoints(8); playPop(); }
+  function spinChallenge(){ const wheel=['Hug','Kiss','Massage','Compliment','Movie Night','Selfie','Forehead Kiss','Secret Wish']; const res = wheel[Math.floor(Math.random()*wheel.length)]; modalEmoji.textContent='🎯'; modalText.innerHTML=`Challenge: <strong>${res}</strong>`; modalSub.textContent='Winner performs it.'; openModal(); addLovePoints(6); playPop(); }
+  function popEmojiAt(x,y){ const e=document.createElement('div'); e.className='modalEmoji'; e.style.position='fixed'; e.style.left=(x-18)+'px'; e.style.top=(y-18)+'px'; e.style.zIndex=90; e.textContent=['💖','😍','😘','💕','✨'][Math.floor(Math.random()*5)]; document.body.appendChild(e); setTimeout(()=>e.remove(),700); }
+  document.getElementById('applyNamesBtn').addEventListener('click',()=>{ const x=document.getElementById('xName').value.trim(); const o=document.getElementById('oName').value.trim(); playerX = x||'X'; playerO = o||'O'; if(pillX && pillX.childNodes.length){ pillX.childNodes[0].nodeValue = playerX+': '; } if(pillO && pillO.childNodes.length){ pillO.childNodes[0].nodeValue = playerO+': '; } });
+  document.getElementById('resetAllBtn2').addEventListener('click',()=>{ if(confirm('Reset all scores and rounds?')){ scores={X:0,O:0}; rounds=0; lovePoints=0; updateScores(); scoreX.textContent='0'; scoreO.textContent='0'; document.getElementById('rounds').textContent='0'; loveFill.style.width='0%'; loveLabel.textContent='Love 0%'; resetBoard(); } });
+  document.getElementById('restartBtn').addEventListener('click',()=>resetBoard());
+  document.getElementById('shuffleChallenges').addEventListener('click',()=>{ challenges = challenges.sort(()=>Math.random()-0.5); renderChallenges(); });
+  document.getElementById('spinPunishmentBtn').addEventListener('click',()=>spinPunishmentWheel());
+  document.getElementById('spinWheelBtn').addEventListener('click',()=>spinChallenge());
+  document.getElementById('addChallenge').addEventListener('click',()=>{ const v=newChallenge.value.trim(); if(v){ challenges.unshift(v); newChallenge.value=''; renderChallenges(); } });
+  claimBtn.addEventListener('click',()=>{ alert('Claim recorded — enjoy your sweet moment ❤️'); closeModalNow(); });
+  closeModal.addEventListener('click',()=>{ closeModalNow(); });
+  const giftClaimBtn = document.getElementById('giftClaimBtn');
+  const giftCloseBtn = document.getElementById('giftCloseBtn');
+  if(giftClaimBtn) giftClaimBtn.addEventListener('click',()=>{ document.getElementById('giftText').textContent='Lip-Lock Love'; alert('Lip-Lock Love! 💋'); closeGiftModal(); });
+  if(giftCloseBtn) giftCloseBtn.addEventListener('click',()=>{ closeGiftModal(); });
+  createBoard(); renderChallenges();
+  window.addEventListener('keydown',(e)=>{ if(e.key>='1'&&e.key<='9'){ const idx=parseInt(e.key)-1; const c=document.querySelector(`.cell[data-index='${idx}']`); if(c) c.click(); } if(e.key==='Escape') closeModalNow(); });
+  </script>
+</body>
+</html>
