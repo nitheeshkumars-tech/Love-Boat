@@ -199,7 +199,77 @@
   let giftShown = false;
   let board = Array(9).fill(null);
   let scores = {X:0,O:0}; let rounds = 0; let lovePoints=0;
-  let challenges = ['10‑second hug','Sweet kiss','Compliment','Slow dance','Backrub','Share a secret','Movie pick','Whisper something sweet','Favorite memory','Forehead kiss'];
+  let challenges = [
+  // ❤️ Romantic
+  "Give a forehead kiss",
+  "10-second warm hug",
+  "Hold hands for 1 minute",
+  "Whisper something sweet",
+  "Give a cheek kiss",
+  "Say one thing you love about me",
+  "Slow dance for 20 seconds",
+  "Share a romantic compliment",
+  "Look into each other’s eyes for 15 seconds",
+  "Give a gentle nose kiss",
+
+  // 😘 Spicy / Flirty
+  "Kiss on the neck",
+  "Kiss on the lips for 5 seconds",
+  "Bite the lip softly 😉",
+  "Do a flirty pose",
+  "Whisper something naughty",
+  "Give a “pull-me-closer” hug",
+  "Sit on each other's lap",
+  "Give a kiss on the shoulder",
+  "Kiss on the hand like a prince/princess",
+
+  // 😂 Funny / Punishment
+  "Do a funny dance",
+  "Act like a cat for 20 seconds",
+  "Speak in baby voice for 30 seconds",
+  "Tell a dramatic cheesy pickup line",
+  "Do one silly pose",
+  "Try to wink both eyes dramatically",
+  "Sing “Laaa-laa-laaa” like you're in a movie",
+  "Make a heart shape with your hands and say “uwu”",
+  "Pretend to model on a runway for 10 seconds",
+  "Tell a bad joke seriously",
+
+  // 💞 Cute Couple Activities
+  "Take a selfie together",
+  "Share a cute secret",
+  "Kiss each other’s hand",
+  "Rest head on shoulder for 20 seconds",
+  "Hug from behind",
+  "Share one dream you have about our future",
+  "Do a “couple handshake”",
+  "Touch foreheads gently",
+  "Draw a heart on my hand with your finger",
+
+  // 🔥 Physical / Playful Challenges (YOUR NEW LIST)
+  "Kiss on Nose",
+  "Bite on Nose",
+  "Bite lip",
+  "Bite ears",
+  "Bite shoulder or hand",
+  "Pinch on leg or hand",
+  "Punch on nose (cute punch)",
+  "Punch your wish (playful)",
+  "Close your eyes and do (mystery task)",
+  "Gentle hug",
+  "Say one secret",
+  "Take a funny pic",
+  "Lifting gem",
+  "One backhug",
+  "Surrender on leg",
+  "Slap (playful)",
+  "Kiss on throat",
+  "Kiss on chest",
+  "Kiss on eyes",
+  "Freeze",
+  "Kich kichee making (tickle)"
+];
+
   function renderChallenges(){ challengesList.innerHTML=''; challenges.forEach((c,i)=>{ const chip=document.createElement('span'); chip.className='chip'; chip.textContent=c; chip.onclick=()=>{ challenges.splice(i,1); renderChallenges(); }; challengesList.appendChild(chip); }); }
   function createBoard(){ boardEl.innerHTML=''; for(let i=0;i<9;i++){ const cell=document.createElement('div'); cell.className='cell'; cell.dataset.index=i; cell.addEventListener('click',(e)=>onCellClick(i,cell,e)); boardEl.appendChild(cell);} }
   function makeX(){
